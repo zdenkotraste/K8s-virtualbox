@@ -1,1 +1,1 @@
-{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"E:/proyecto/k8snode1","disabled":false,"__vagrantfile":true}}}
+{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"E:/proyecto/K8s-virtualbox/k8snode1","disabled":false,"__vagrantfile":true}}}
