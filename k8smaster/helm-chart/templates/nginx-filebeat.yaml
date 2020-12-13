@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-auto
+  labels:
+    name: nginx-auto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: nginx-auto
+  template:
+    metadata:
+      labels:
+        name: nginx-auto
+    spec:
+      containers:
+      - name: nginx-auto
+         image: nginx
+         volumeMounts:
+         - name: log-output
+           mountPath: /var/log/nginx/
+      - name: beat-auto
+         image: elastic/filebeat:7.8.0
+         env:
+         - name: LOGSTASH_HOSTS
+           value: {{ .Values.global.hostIp }}:{{ .Values.ports.logstash }}
+         args: [
+           "-c", "/etc/filebeat/filebeat.yml",
+           "-e"
+         ]
+         volumeMounts:
+         - name: log-output
+           mountPath: /var/log/nginx/
+         - name: beat-config
+           mountPath: /etc/filebeat/
+      volumes:
+      - name: log-output
+         emptyDir: {}
+      - name: beat-config
+         configMap:
+           name: beat-config
+           items:
+           - key: filebeat.yml
+             path: filebeat.yml
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: beat-config
+data:
+  filebeat.yml: |
+{{ .Files.Get "filebeat.yml" | indent 4 }}

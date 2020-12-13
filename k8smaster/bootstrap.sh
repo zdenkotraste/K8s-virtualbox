@@ -16,3 +16,6 @@ kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl versio
 sudo sh -c "echo 'Environment=”KUBELET_EXTRA_ARGS=--node-ip=192.168.100.10”' >> /etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
 sudo systemctl daemon-reload
 sudo systemctl restart kubelet
+sudo curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+kubectl label nodes k8snode1 logstash=true kibana=true filebeat=true elasticsearch=false
+kubectl label nodes k8snode2 elasticsearch=true filebeat=false logstash=false kibana=false
