@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-auto
+  labels:
+    name: app-auto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: app-auto
+  template:
+    metadata:
+      labels:
+        name: app-auto
+    spec:
+      containers:
+      - name: app-auto
+        image: sladesoftware/log-application:latest
+        volumeMounts:
+        - name: log-output
+          mountPath: /tmp/
+      - name: beat-auto
+        image: elastic/filebeat:7.8.0
+        env:
+        - name: LOGSTASH_HOSTS
+          value: 192.168.100.11:{{ .Values.ports.logstash }}
+        args: [
+            "-c", "/etc/filebeat/filebeat.yml",
+            "-e"
+        ]   
+        volumeMounts:
+        - name: log-output
+          mountPath: /tmp/
+        - name: beat-config
+          mountPath: /etc/filebeat/
+      volumes:
+      - name: log-output
+        emptyDir: {}
+      - name: beat-config
+        configMap:
+          name: beat-config
+          items:
+          - key: filebeat.yml
+            path: filebeat.yml
+      nodeSelector: 
+        filebeat: "true"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: beat-config
+data:
+  filebeat.yml: |
+{{ .Files.Get "filebeat.yml"| indent 4 }}
