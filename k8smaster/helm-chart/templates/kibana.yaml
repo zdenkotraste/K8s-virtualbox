@@ -16,13 +16,14 @@ spec:
     spec:
       containers:
         - name: kib-auto
-           image: kibana:7.8.0
-           ports:
-             - containerPort: 5601
-               name: http
-           env:
+          image: kibana:7.8.0
+          ports:
+          - containerPort: 5601
+          env:
             - name: ELASTICSEARCH_HOSTS
-               value: http://{{ .Values.global.hostIp }}:{{ .Values.ports.elasticsearch }}
+              value: http://192.168.100.12:{{ .Values.ports.elasticsearch }}
+      nodeSelector:
+        kibana: "true"        
 ---
 apiVersion: v1
 kind: Service
